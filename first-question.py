@@ -5,6 +5,7 @@ image[:, 0] = 0
 image[:, -1] = 0
 image[0, :] = 0
 image[-1, :] = 0
+print(image[0])
 plt.imshow(image, cmap='gray')
 plt.show()
 noisy = image + 0.2 * np.random.rand(5, 10)
