@@ -1,22 +1,51 @@
-import matplotlib.pyplot as plt
+# numpy for vector and matrix manipulations
 import numpy as np
-image = np.ones((5, 10))
-image[:, 0] = 0
-image[:, -1] = 0
-image[0, :] = 0
-image[-1, :] = 0
-print(image[0])
-plt.imshow(image, cmap='gray')
-plt.show()
-noisy = image + 0.2 * np.random.rand(5, 10)
-noisy = noisy/noisy.max()
-plt.imshow(noisy, cmap='gray')
-plt.show()
-rand_index = np.random.randint(0, 50)
-rand_image = np.array(image)
-rand_image[int(rand_index % 5),
- int(rand_index / 5)] = np.where(
- rand_image[int(rand_index % 5), int(rand_index / 5)] == 1,
- 0.0, 1.0)
-plt.imshow(rand_image, cmap='gray')
-plt.show()
+
+def activation(z, derivative=False):
+    """
+    Sigmoid activation function:
+    It handles two modes: normal and derivative mode.
+    Applies a pointwize operation on vectors
+    
+    Parameters:
+    ---
+    z: pre-activation vector at layer l
+        shape (n[l], batch_size)
+
+    Returns: 
+    pontwize activation on each element of the input z
+    """
+    if derivative:
+        return activation(z) * (1 - activation(z))
+    else:
+        return 1 / (1 + np.exp(-z))
+
+def cost_function(y_true, y_pred):
+    """
+    Computes the Mean Square Error between a ground truth vector and a prediction vector
+    Parameters:
+    ---
+    y_true: ground-truth vector
+    y_pred: prediction vector
+    Returns:
+    ---
+    cost: a scalar value representing the loss
+    """
+    n = y_pred.shape[1]
+    cost = (1./(2*n)) * np.sum((y_true - y_pred) ** 2)
+    return cost
+
+def cost_function_prime(y_true, y_pred):
+    """
+    Computes the derivative of the loss function w.r.t the activation of the output layer
+    Parameters:
+    ---
+    y_true: ground-truth vector
+    y_pred: prediction vector
+    Returns:
+    ---
+    cost_prime: derivative of the loss w.r.t. the activation of the output
+    shape: (n[L], batch_size)    
+    """
+    cost_prime = y_pred - y_true
+    return cost_prime    

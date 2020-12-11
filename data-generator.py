@@ -81,13 +81,5 @@ np.save("yd_test.csv", y_desired_test)
 
 for i in x_input:
     plt.imshow(i, cmap='gray')
-    plt.show()
+    plt.show() 
 
-
-#[x]önce total veri kümesini yd ler ile beraber birleştir. 
-#[x]farklı veiler ile test kümesi oluşturulması
-#[x]Tüm verileri vektöre çevir, kaydet, normalize et
-#gradyan hesaplayan fonkfiyon, aktivasyon fonksiyon, momentum terimi unutma
-#ileri yol ve geri yol fonkfiyon
-#ağırlık göncelleme
-#hata hesap-grafik
