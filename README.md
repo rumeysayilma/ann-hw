@@ -1,4 +1,4 @@
-# ann-hw , Plain Python-Numpy Multilayer Perceptron with Backpropagation and Momentum.
+# Plain Python-Numpy Multilayer Perceptron with Backpropagation and Momentum.
 
 Multilayer Perceptron Neural Network With only Raw Python
 This is an artifical neural network homework repo aims to help other studenst.
