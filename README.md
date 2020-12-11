@@ -8,7 +8,7 @@ Our homework is generate 5 x 10 pixel black & white images and add noise and exc
 After creating data we will create a multilayered backpropagation, neural network and train our data then test and graphically showing our results.
 
 [x] First generate training data x and their y_desired values and save them.
-![training data](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png)
+![training data](https://github.com/rumeysayilma/ann-hw/blob/master/images/harfler/trainin_data.jpg)
 
 [x]farklı veiler ile test kümesi oluşturulması
 [x]Tüm verileri vektöre çevir, kaydet, normalize
