@@ -1,4 +1,4 @@
-# ann-hw
+# ann-hw , Plain Python-Numpy Multilayer Perceptron with Backpropagation and Momentum.
 
 Multilayer Perceptron Neural Network With only Raw Python
 This is an artifical neural network homework repo aims to help other studenst.
@@ -7,14 +7,32 @@ Our homework is generate 5 x 10 pixel black & white images and add noise and exc
 
 After creating data we will create a multilayered backpropagation, neural network and train our data then test and graphically showing our results.
 
-[x] First generate training data x and their y_desired values and save them.
-![training data](https://github.com/rumeysayilma/ann-hw/blob/master/images/harfler/trainin_data.jpg)
+# Generate data
 
-[x]farklı veiler ile test kümesi oluşturulması
-[x]Tüm verileri vektöre çevir, kaydet, normalize
-[x]aktivasyon fonksiyon
-ileri yol
-gradyan hesaplayan fonkfiyon, momentum terimi unutma
-ileri yol ve geri yol fonkfiyon
-ağırlık göncelleme
-hata hesap-grafik
+- [x] First generate training data x and their y_desired values and save them.
+- [x] Generate test data
+
+![training data](https://github.com/rumeysayilma/ann-hw/blob/master/images/trainin_data.jpg)
+
+- [x] Vectorize all input x values
+
+![vectorized training data](https://github.com/rumeysayilma/ann-hw/blob/master/images/vectorized-training-data.jpg)
+
+## Utility Functions
+
+- [x] Activation Func.
+- [x] Error and Loss Fucntions
+
+## Create Neural Network Class
+
+- [ ] Create a Class that handles everything in a multilayer Perceptron.
+  - [ ] initialize biases and weights
+  - [ ] Forward Propagation
+  - [ ] Backward Propagation
+  - [ ] Gradient Calculate
+  - [ ] Training Function
+    - [ ] Start with initial weights
+    - [ ] go forward -> go backward -> error -> gradients -> update ->
+    - [ ] Stop criteria
+  - [ ] Predict Fucntion
+  - [ ] Visualize
