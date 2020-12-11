@@ -66,5 +66,6 @@ class NeuralNetwork():
       return deltas
 
     def backward(self,deltas,v_values,y_values):
+      ''' Will come soonn '''
 
 
