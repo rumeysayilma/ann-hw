@@ -1,39 +1,15 @@
-# numpy for vector and matrix manipulations
+import NeuralNetwork
 import numpy as np
 
-def activation(z, derivative=False):
 
-    if derivative:
-        return activation(z) * (1 - activation(z))
-    else:
-        return 1 / (1 + np.exp(-z))
+""" Reading saved Data  """
+X_train = np.load('x_egitim.npy')
+y_desired = np.load('yd_egitim.npy')
 
-def cost_function(y_true, y_pred):
-    """
-    Computes the Mean Square Error between a ground truth vector and a prediction vector
-    Parameters:
-    ---
-    y_true: ground-truth vector
-    y_pred: prediction vector
-    Returns:
-    ---
-    cost: a scalar value representing the loss
-    """
-    n = y_pred.shape[1]
-    cost = (1./(2*n)) * np.sum((y_true - y_pred) ** 2)
-    return cost
+X_test = np.load('x_test.npy')
+y_test_desired = np.load('yd_test.npy')
 
-def cost_function_prime(y_true, y_pred):
-    """
-    Computes the derivative of the loss function w.r.t the activation of the output layer
-    Parameters:
-    ---
-    y_true: ground-truth vector
-    y_pred: prediction vector
-    Returns:
-    ---
-    cost_prime: derivative of the loss w.r.t. the activation of the output
-    shape: (n[L], batch_size)    
-    """
-    cost_prime = y_pred - y_true
-    return cost_prime    
+Network = NeuralNetwork.NeuralNetwork([50, 3, 4])
+History = Network.train(x_train=X_train, y_train=y_desired, x_test=X_test, y_test=y_test_desired, epochs=100, learning_rate=0.5, alfa=0.6, tqdm_=True)
+
+print(History)

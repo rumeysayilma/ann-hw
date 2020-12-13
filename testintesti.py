@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score
 
 def activation(z, derivative=False):
 
@@ -17,6 +18,11 @@ X_test = np.load('x_test.npy')
 y_test_desired = np.load('yd_test.npy')
 
 size = [50,3,4]
+
+def cost_function(y_true, y_pred):
+    n = y_pred.shape[1]
+    cost = (1./(2*n)) * np.sum((y_true - y_pred) ** 2)
+    return cost
 
 #size boyutunda ağırlık kümesi oluşturulur. 
 #Bu küme her bir verinin eğitimi sonrasında güncellenerek yeni veri eğitime girer
@@ -50,14 +56,20 @@ for i, (a, y_d) in enumerate(zip(a, y_desired)):
     # Gradyenler bulunmaya başlandı
 
     #önce hata bulundu
-    e = y_d - y_output_values
-    #print(e)
+    e = (np.reshape(y_d,(4,1)) - y_output_values[0])
+    print('EEEEEEEE')
+    print(e)
 
     #çıkış gradyanı bulundu ve tüm gradyanları içerecek kümeye eklendi
     gradients = [0] * (len(size)-1)
+    print(',,,,,,,,,,,,,,,,,,,,,,,,,gradients')
+    print(gradients)
     # grad1_0 = [2,3,4,5] , grad2_0 = [2,3,4,1] ,grad3_0.. grad4_0
-    gradients[-1] =  e * activation(v_values[-1].T, derivative=True)
-    gradients[-1] = np.reshape(gradients[-1], (4,4))
+    gradients[-1] =  e * activation(v_values[-1].T, derivative=True).T
+    print(gradients[-1])
+    print(',,,,,,,,,,,,,,,,,,,,,,,,')
+    print(gradients)
+    """ gradients[-1] = np.reshape(gradients[-1], (4,4)) """
     #gizli katmanı gradyanları bulundu ve gradyan kümesi tamamlandı
     for l in range(len(gradients) - 2, -1, -1):
           
@@ -74,12 +86,14 @@ for i, (a, y_d) in enumerate(zip(a, y_desired)):
     """ print(gradients) """ 
     for l in range(1, len(size)):
         print('****  '+str(l))
+        print('y_values[l-1]')
         print(y_values[l-1])
         print(y_values[l-1].shape)
         print('------------------------')
         print(gradients[l])
         print(gradients[l].shape)
 
+    #Bias ve ağırlıkta oluşacak değişimler bulunur
     for l in range(1, len(size)):
 
         """ 1 2 """
@@ -87,10 +101,44 @@ for i, (a, y_d) in enumerate(zip(a, y_desired)):
         db_l = gradients[l]
         dW.append(dW_l)
         db.append(np.expand_dims(db_l.mean(axis=1), 1))
-    print(dW)
-    print('----------------------------------------------------------------')
-    print(db)  
+        print(l)
 
+        """     
+        for i in range(len(dW)):
+        print(dW[i].shape)
+        print('----------------------------------------------------------------')
+        print(db[i].shape)   
+        """
+    learning_rate=0.3
+    alfa=0.4
+    # weight update
+    for i, (dw_each, db_each) in enumerate(zip(dW, db)):
+        if i > 1:
+            weights[i] = weights[i] - learning_rate * dw_each + alfa*(weights[i] - weights[i-1])
+        else:
+            weights[i] = weights[i] - learning_rate * dw_each 
 
+        biases[i] = biases[i] - learning_rate * db_each
+    for i in range(len(weights)):
+        print(' Weights ')
+        print(weights[i])
+        print('||||||||||||||||||||||||||||||||||||||||||||||||||||')       
+        print(weights[i].shape) 
 
+    for w, b in zip(weights, biases):
+        z = np.dot(w, a) + b
+        a = activation(z)
+    predictions = (a > 0.5).astype(int)
     
+    batch_y_train_pred = (predictions)
+    train_losses = []
+    train_loss = cost_function(y_d, batch_y_train_pred)
+    train_losses.append(train_loss)
+    print('train_losses')
+    print(train_losses)
+    """ 
+    train_accuracies = []
+    train_accuracy = accuracy_score(y_d.T, batch_y_train_pred.T)
+    train_accuracies.append(train_accuracy)  """  
+    
+

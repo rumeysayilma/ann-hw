@@ -29,7 +29,9 @@ After creating data we will create a multilayered backpropagation, neural networ
   - [x] initialize biases and weights
   - [x] Forward Propagation
   - [x] Gradient Calculate
-  - [ ] Backward Propagation
+  - [x] Backward Propagation
+  - [x] Update weights
+  - [x] Momentum fonksiyonlu öğrenme hızı
   - [ ] Training Function
     - [ ] Start with initial weights
     - [ ] go forward -> go backward -> error -> gradients -> update ->
