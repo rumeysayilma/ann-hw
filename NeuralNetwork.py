@@ -3,14 +3,6 @@ from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
-"""  Load All data """
-
-X_train = np.loadtxt('x_egitim.npy', dtype=float)
-y_desired = np.loadtxt('yd_egitim.npy', dtype=float)
-
-X_test = np.loadtxt('x_test.npy', dtype=float)
-y_test_desired = np.loadtxt('yd_test.npy', dtype=float)
-
 
 class NeuralNetwork(object):
     '''
@@ -20,15 +12,13 @@ class NeuralNetwork(object):
     2 neuron ouput
     '''
 
-    def __init__(self, size, rand_seed=42):
+    def __init__(self, size):
 
-        self.rand_seed = rand_seed
-        np.random.seed(self.rand_seed)
         self.size = size
         ''' Inıtializing our all weights  '''
         weights = []
         for i in range(1, len(self.size)):
-            weights.append(np.random.randn(self.size[i], self.size[i-1]))
+            weights.append(np.random.rand(self.size[i], self.size[i-1]))
         biases = []
         ''' All Bias values  are initilazing as vectors  '''
         for b in self.size[1:]:
@@ -36,22 +26,33 @@ class NeuralNetwork(object):
 
     def forward(self, input):
         '''
-        gets input x -> x*w -> v -> activation(v)
+         Bütün inputları bütün w'lar ile çarparak
+        y değerleri ve v değerleri
+        delta hesabı için kaydediliyor
         '''
         a = input
         v_values = []
-        y_values = [a]
-        ''' Bütün inputları bütün w'lar ile çarparak
-        y değerleri ve v değerleri
-        delta hesabı için kaydediliyor'''
-        for w, b in zip(self.weights, self.biases):
-            v = np.dot(w, a) + b
-            y = activation(v)
-            v_values.append(v)
-            y_values.append(y)
-        return a, v_values, y_values
+        y_values=[]
+        y_output_values =[]
+        for i in range(len(a)):
+            v_values.append([])
+            y_values.append([])
+            y_values[i].append(a[i]) 
+            for z,(w, b) in enumerate(zip(weights, biases)):
+                v = np.dot(w, y_values[i][z]) + b
+                y = activation(v)
+                v_values[i].append(v)
+                if z == (len(weights)-1):
+                    y_output_values.append(y)
+                y_values[i].append(y)
+        return(y_output_values, v_values, y_values)
 
+
+    
+
+ 
     def compute_deltas(self, v_values, y_true, y_pred):
+
         e = (y_true - y_pred)
         delta_L = (e) * activation(v_values[-1], derivative=True)
         '''  gradyen_0 = e * sig'(v output)  '''

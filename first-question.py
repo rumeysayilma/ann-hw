@@ -2,19 +2,7 @@
 import numpy as np
 
 def activation(z, derivative=False):
-    """
-    Sigmoid activation function:
-    It handles two modes: normal and derivative mode.
-    Applies a pointwize operation on vectors
-    
-    Parameters:
-    ---
-    z: pre-activation vector at layer l
-        shape (n[l], batch_size)
 
-    Returns: 
-    pontwize activation on each element of the input z
-    """
     if derivative:
         return activation(z) * (1 - activation(z))
     else:

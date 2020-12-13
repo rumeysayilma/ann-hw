@@ -55,8 +55,8 @@ def gray_noise(t, h, a, l):
 
 
 def data_vectorizer(data_to_vector):
-    data_to_vector = [a.reshape((50, 1)) for a in data_to_vector]
-    return data_to_vector
+    final = [a.reshape((50, 1)) for a in data_to_vector]
+    return final
 
 
 # veri oluşturan ve gürültü ekleyen fonksiyonlar çağrıldı.
@@ -71,9 +71,9 @@ e4 = [0, 0, 0, 1]
 
 x_input = [t, h, a, l, t_degisik, h_degisik, a_degisik,
            l_degisik, t_noisy, h_noisy, a_noisy, l_noisy]
-for i in x_input:
+""" for i in x_input:
     plt.imshow(i, cmap='gray')
-    plt.show()
+    plt.show() """
 
 # eğitim kümesindeki veriler sınıflandırıldı ve vektörleştirildi
 y_desired = [e1, e2, e3, e4, e1, e2, e3, e4, e1, e2, e3, e4]
@@ -92,6 +92,7 @@ np.save("yd_egitim", y_desired)
 np.save("x_test", x_test)
 np.save("yd_test", y_desired_test)
 
-for i in x_input:
+""" for i in x_input:
     plt.imshow(i, cmap='gray')
     plt.show()
+ """
