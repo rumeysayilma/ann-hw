@@ -21,6 +21,7 @@ size = [50,3,4]
 weights = []
 for i in range(1, len(size)):
     weights.append(np.random.rand(size[i], size[i-1]))
+
 biases = []
 for b in size[1:]:
     biases.append(np.random.rand(b, 1))
@@ -49,72 +50,50 @@ for i in range(len(a)):
         y_values[i].append(y)
 """ print(y_output_values, v_values, y_values)
 """
+
 y_true = np.asarray(y_output_values).reshape(12,4)
 yd = y_desired.reshape(12,4)
 y_pred = y_values
-""" 
-def compute_deltas(self, v_values, y_true, y_pred):
-"""
-"""  """
-e = yd- y_true
+
+e = yd - y_true
 e = np.asarray(e)
 """ v_values yukardan """
+
 v_values = np.asarray(v_values)
 gradyen_output = []
 
 for i in range(len(v_values)):
     gradyen_output.append(e[i] * activation(v_values[i][-1].T, derivative=True))
-    print(e[i])
-    print('****')
-    print(v_values[i][-1])
 
-"""gradients bütün datalar için bütün gradientleri içerecek.  """
+"""gradients bütün datalar için bütün gradientleri içerecek.yani her veri için giriş çıkış dahil 
+toplam katman sayısının 1 eksiği kadar gradyan burada tutulur.
+Bizim verimiz için 3 katman-1 --> 2 gradyan her veri için burada tutuluyor  """
+
 gradients =[]
 for i in range(len(e)):
     gradients.append([])
-
-
-
-gradients[-1] = gradyen_output
-print(gradients)
-
-print('--------------------------------')
-print(gradyen_output)
+    for l  in range(len(size)-1):
+        gradients[i].append([])
+      
+""" gradyen outputs gradyenlere ekleniyor  """
 for i  in range(len(e)):
-    gradients.append([])
-    for l in range(len(gradients) - 2, -1, -1):
-        delta = np.dot(weights[i][l + 1].transpose(), gradients[i][l + 1]) * activation(v_values[l], derivative=True)
-        gradients[i].append(delta)
-print(gradients)
+    gradients[i][-1] = gradyen_output[i][0]
+    
+v_values =  np.asarray(v_values)
+""" gradients  = [[[],[2,3,4,6]], ......] """
+for i  in range(len(e)):
+    """ 
+    [[],[2,3,4,6]] 
+    """
+    print(gradients[i])
+    for l in range(len(gradients[i]) - 2, -1, -1):
+        delta = np.dot(weights[l + 1].transpose(), gradients[i][l + 1]) * activation(v_values[i][l], derivative=True)
+        gradients[i][l].append(delta)
+print(gradients[0])
 
-""" 
-    def compute_deltas(self, v_values, y_true, y_pred):
-
-
-        ''' katman sayısının bir eksiği kadar delta olacak'''
-        deltas = [0] * (len(self.size) - 1)
-        '''gradyen_0 dan başa giderek gradyenler bulunacak
-      sonuncusu grandyen_0 '''
-        deltas[-1] = delta_L
-        ''' zaten son katmandaki deltayı bulduk
-      katman sayısı-1 kadar delta olacaktı.
-      yani deltas-2 kadar delta kaldı bulacağımız.
-      yani delta -2'den 0'a kadar (0 dahil )
-      listenin sonundan başa giderek loop yapıyoruz.
-      ve bir önceki katmandaki deltayı bulup listeye ekliyoruz.
-         '''
-
-        for l in range(len(deltas) - 2, -1, -1):
-            delta = np.dot(self.weights[l + 1].transpose(), deltas[l + 1]
-                           ) * activation(v_values[l], derivative=True)
-            deltas[l] = delta
-        return deltas
-
-""" 
-"""
-print(v_values[1].shape)
-'''  gradyen_0 = e * sig'(v output)  '''
+dw = []
+db = []
 
 
-print(e) """
+
 

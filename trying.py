@@ -2,22 +2,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-t = np.ones((5, 10))
-t[:, 5] = 0
-t[0, :] = 0
-t = np.where(t == 0, 0.1, 0.9)
-t_degisik = np.copy(t)
-t_degisik[0, 0], t_degisik[1, 0], t_degisik[3, 4], t_degisik[3, 5] = 1, 0, 0, 1
-print(t_degisik)
-for i in [t, t_degisik]:
-    plt.imshow(i, cmap='gray')
-    plt.show()
+size=[50,4,4]
 
-""" print(t)
-x_tryi = [t,l]
-x_tryi = [a.reshape((50,1)) for a in x_tryi] """
+weights = []
+for i in range(1, len(size)):
+    weights.append(np.random.rand(size[i], size[i-1]))
 
-""" t = np.reshape(np.where(t == 0, 0.1, 0.9), (50, 1)) """
-print(t)
-print(x_tryi)
-print(l)
+
+
+gradients =[]
+
+for i in range(len(e)):
+    gradients.append([])
+    for l  in range(len(size)-1):
+        gradients[i].append([])
+      
+
+"""  """
+
+for i  in range(len(e)):
+    gradients[i][-1] = gradyen_output[i][0]
+    print(gradients[i][-1])
+
