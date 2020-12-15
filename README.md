@@ -38,3 +38,14 @@ After creating data we will create a multilayered backpropagation, neural networ
     - [ ] Stop criteria
   - [ ] Predict Fucntion
   - [ ] Visualize
+  1. soru
+  -accuracy ekle
+  -hem test hem eğitimin olduğ grafikleri kaydet
+
+  2. soru
+  -sorun çöz
+  -accuracy ekle
+  -hem test hem eğitimin olduğ grafikleri kaydet
+
+  Son
+  döküman
