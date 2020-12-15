@@ -69,7 +69,7 @@ print(allTrainLosses[0])
 print(len(allTrainLosses[0]))
 
 
-for i in range(len([1, 2, 34])):
+for i in range(len(allTrainLosses)):
     plt.plot(allTrainLosses[i])
     plt.title(str(11-i) + ' kadar ara nöron için  Eğitim Karesel ortalama hata')
     plt.xlabel("Epoch sayısı")
@@ -82,8 +82,9 @@ for i in range(len([1, 2, 34])):
     plt.ylabel("Toplam Karesel Ortalama Hata")
     plt.show()
 
-    plt.scatter(range(len(allTrainLosses)), allTrainLosses[i])
+    plt.plot(range(len(allTrainLosses[i])), allTrainLosses[i], "ro")
     plt.title(str(11-i) + ' kadar ara nöron için Test Karesel ortalama hata')
     plt.xlabel("Data ")
     plt.ylabel("Toplam Karesel Ortalama Hata")
     plt.show()
+    fig.savefig('x.png')
