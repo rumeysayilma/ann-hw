@@ -92,7 +92,9 @@ np.save("yd_egitim", y_desired)
 np.save("x_test", x_test)
 np.save("yd_test", y_desired_test)
 
-""" for i in x_input:
-    plt.imshow(i, cmap='gray')
-    plt.show()
- """
+print(x_input)
+for i in len(x_input):
+    print(x_input[i])
+    print('----------------------')
+    print(y_desired[i])
+

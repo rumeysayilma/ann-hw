@@ -30,6 +30,9 @@ for row in f:
         rowsArray.pop()
         x.append(np.array(rowsArray).astype(np.float).T)
 
+def data_vectorizer(data_to_vector,n):
+    final = [a.reshape((n, 1)) for a in data_to_vector]
+    return final
 
 def datayi_karistir_test_ve_egitimi_ayir(x, y):
     c = list(zip(x, y))
@@ -41,35 +44,37 @@ def datayi_karistir_test_ve_egitimi_ayir(x, y):
     yd_test = yd_shuffled[120:150]
     return x_egitim, x_test, yd_egitim, yd_test
 
-
 x_egitim, x_test, yd_egitim, yd_test = datayi_karistir_test_ve_egitimi_ayir(
     x, y_d)
-
-for i in range(len(x_egitim)):
-    print(x_egitim[i])
-    print('---------')
-    print(yd_egitim[i])
-
-
-def plot_history(history):
-    n = history['epochs']
-    plt.figure(figsize=(15, 5))
-    n = 4000
-    plt.plot(range(history['epochs'])[:n],
-             history['train_loss'][:n], label='train_loss')
-
-    plt.title('train  loss')
-    plt.grid(1)
-    plt.xlabel('epochs')
-    plt.legend()
-
-    plt.legend()
+x_egitim = data_vectorizer(x_egitim,4)
+yd_test = data_vectorizer(yd_test,3)
+yd_egitim = data_vectorizer(yd_egitim,3)
+x_test = data_vectorizer(x_test,4)
 
 
-Network = NeuralNetwork.NeuralNetwork([4, 3, 3])
-History = Network.train(x_train=x_egitim, y_train=yd_egitim, x_test=x_test,
-                        y_test=yd_test, epochs=100, learning_rate=0.5, alfa=0.6, tqdm_=True)
 
-print(History)
 
-plot_history(History)
+allTestLosses = []
+allTrainLosses = []
+for i in range(10):
+    Network = NeuralNetwork.NeuralNetwork([4, 11-i, 3])
+    epoch,loss,test_loss = Network.train(x_train=x_egitim, y_train=yd_egitim, x_test=x_test,
+                        y_test=yd_test, epochs=10, learning_rate=0.7, alfa=0.6, tqdm_=True)
+    allTrainLosses.append(test_loss)
+    allTestLosses.append(loss)    
+print(allTrainLosses[0])
+print(len(allTrainLosses[0]))
+
+
+for i in range(len([1,2,34])):
+    plt.plot(allTrainLosses[i])
+    plt.title(str(11-i) + ' kadar ara nöron için  Eğitim Karesel ortalama hata')
+    plt.xlabel("Epoch sayısı")
+    plt.ylabel("Toplam Karesel Ortalama Hata")
+    plt.show()
+
+    plt.plot(allTrainLosses[i])
+    plt.title(str(11-i) + ' kadar ara nöron için Test Karesel ortalama hata')
+    plt.xlabel("Data ")
+    plt.ylabel("Toplam Karesel Ortalama Hata")
+    plt.show()
