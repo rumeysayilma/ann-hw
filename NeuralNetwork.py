@@ -3,14 +3,14 @@ from matplotlib import pyplot as plt
 # from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
-
+#sigmoid aktivasyon fonksiyonu.
 def activation(z, derivative=False):
     if derivative:
         return activation(z) * (1 - activation(z))
     else:
         return 1 / (1 + np.exp(-z))
 
-
+#Karesel Hata Hesaplayıcı
 def cost_function(y_true, y_pred):
     n = y_pred.shape[1]
     cost = (1./(2*n)) * np.sum((y_true - y_pred.T) ** 2)
@@ -19,72 +19,58 @@ def cost_function(y_true, y_pred):
 
 class NeuralNetwork(object):
     '''
-    size is for example [4,3,2] -> means we have
-    4 neuron input
-    3 neuron hidden layer
-    2 neuron ouput
+    size örnek olarak [4,3,2] ise bunun anlamı:
+    4 nöron giriş
+    3 nöron gizli katman
+    2 nöron çıkış
     '''
-
     def __init__(self, size):
 
         self.size = size
-        ''' Inıtializing our all weights  '''
+        ''' 
+        Belirtilen size'a uygun olarak
+        ilk ağırlıklar ve biase'ler rastgele
+        elemanlardan oluşturuluyor.  
+        '''
         self.weights = [np.random.randn(self.size[i], self.size[i-1]) * np.sqrt(
             1 / self.size[i-1]) for i in range(1, len(self.size))]
         self.biases = [np.random.rand(n, 1) for n in self.size[1:]]
 
-    def __str__(self):
-        return (str(self.weights[0]))
-
-    def __repr__(self):
-        return "<Test a:%s b:%s>" % (self.a, self.b)
-
     def forward(self, input):
         '''
-         Bütün inputları bütün w'lar ile çarparak
+        Bütün inputlar, bütün w'lar ile sırayla 
+        çarpılarak ilerleniyor.
         y değerleri ve v değerleri
-        delta hesabı için kaydediliyor
+        gradyen hesabı için kaydediliyor
         '''
         a = input
         v_values = []
         y_values = []
         y_values.append(a)
-    # print(y_values)
+        #Burada w,b o katmana ait w,b'yi temsil ediyor
         for z, (w, b) in enumerate(zip(self.weights, self.biases)):
             v = np.dot(w, y_values[z]) + b
             a = activation(v)
             v_values.append(v)
-            # eğer son ağlıktaysak onu ayrı bir listede tutuyoruz.
             y_values.append(a)
-            '''
-            if z == (len(self.weights)-1):
-                y_output_values.append(y)
-                # y_values.append(y)
-            else:
-                y_values.append(y) '''
+        # return edilen a değeri y_output değerleri olacaktır.
         return (a, v_values, y_values)
 
-    # Gradyenler bulunmaya başlandı
     def compute_gradients(self, v_values, y_d, y_output_values):
 
-        # önce hata bulundu
+        # önce hata hesaplanıyor
         e = (np.reshape(y_d, (self.size[-1], 1)) - y_output_values[0].T)
 
         # çıkış gradyanı bulundu ve tüm gradyanları içerecek kümeye eklendi
+        # toplam gradyan sayısı size-1 olacaktır.
         gradients = [0] * (len(self.size)-1)
         gradients[-1] = e * activation(v_values[-1].T, derivative=True).T
 
-        # gizli katmanı gradyanları bulundu ve gradyan kümesi tamamlandı
+        # son gradyenden geriye doğru gidilerek diğer gradyenler bulunuyor.
         for l in range(len(gradients) - 2, -1, -1):
             delta = np.dot(self.weights[l + 1].transpose(), gradients[l + 1]
                            ) * activation(v_values[l], derivative=True)
             gradients[l] = delta
-
-        """
-        gradients bütün datalar için bütün gradientleri içerecek.yani her veri için giriş çıkış dahil
-        toplam katman sayısının 1 eksiği kadar gradyan burada tutulur.
-        Bizim verimiz için 3 katman-1 --> 2 gradyan her veri için burada tutuluyor
-        """
         return(gradients)
 
     def backpropagate(self, gradients, v_values, y_values):
@@ -92,11 +78,8 @@ class NeuralNetwork(object):
         dW = []
         db = []
         gradients = [0] + gradients
-        # Bias ve ağırlıkta oluşacak değişimler bulunur
+        # Bias ve ağırlıkta oluşacak değişimler bulunuyor ve dw,db'de tutuluyor.
         for l in range(1, len(self.size)):
-            # print(gradients[l])
-            # print(l)
-            # print(y_values[l-1])
             dW_l = np.dot(gradients[l], y_values[l-1].transpose())
             db_l = gradients[l]
             dW.append(dW_l)
@@ -105,11 +88,10 @@ class NeuralNetwork(object):
 
     def train(self, x_train, y_train, x_test, y_test, epochs, learning_rate, alfa, tqdm_=True):
 
-        history_train_losses = []
-        history_train_accuracies = []
-
-        history_test_accuracies = []
-
+        #boş hata ve accuracy listeleri
+        all_train_loss = []
+        all_train_accuracies = []
+        #tqdm isteğe bağlı..
         if tqdm_:
             epoch_iterator = tqdm(range(epochs))
         else:
@@ -120,19 +102,18 @@ class NeuralNetwork(object):
             train_accuracies = []
 
             for i, (a, y_d) in enumerate(zip(x_train, y_train)):
-
-                y_output_values, v_values, y_values = self.forward(a)
+                # forward -> gradients -> backward -> test -> update weight,biases
+                y_train_pred, v_values, y_values = self.forward(a)
                 gradients = self.compute_gradients(
                     v_values, y_d, y_output_values)
-
                 dW, db = self.backpropagate(gradients, v_values, y_values)
-
-                y_train_pred = y_output_values
-
+                
+                #loss ve accuracy hesaplanıyor.
                 train_loss = cost_function(y_d, y_train_pred)
                 train_losses.append(train_loss)
-                """
-                """
+                train_accuracy = (np.sum(np.equal((y_d.T - y_train_pred.T),
+                                        np.zeros((1, y_d.shape[0])))))*100 / y_d.shape[0]
+                train_accuracies.append(train_accuracy)
 
                 # weight update
                 for i, (dw_each, db_each) in enumerate(zip(dW, db)):
@@ -145,29 +126,31 @@ class NeuralNetwork(object):
                             learning_rate * dw_each
 
                     self.biases[i] = self.biases[i] - learning_rate * db_each
+            #her epochta loss ve accuracy ortalaması  alınıp listeye ekleniyor.
+            all_train_loss.append(np.mean(train_losses))
+            all_train_accuracies.append(np.mean(train_accuracy))
 
-            history_train_losses.append(np.mean(train_losses))
-            # history_train_accuracies.append(np.mean(train_accuracies))
-
-            # history_test_accuracies.append(np.mean(test_accuracies))
+        # Test kümesi -> eğitim sonrası test ediliyor.
         test_losses = []
         test_accuracies = []
         for i, (x_test, y_test) in enumerate(zip(x_test, y_test)):
             y_test_pred, accuracy_pred = self.predict(x_test)
-
+            # tahmini y değerinden gerçek y değeri çıkarılıp farkları incelendi
+            # sıfır olanlar için doğru tahmin ,farklı olanlar yanlıştır.
             accuracy = (np.sum(np.equal((y_test.T - accuracy_pred.T),
-                                        np.zeros((1, y_test.T.shape[1])))))*100 / y_test.T.shape[1]
-            print('ITS TRUE')
+                                        np.zeros((1, y_test.shape[0])))))*100 / y_test.shape[0]            
             test_accuracies.append(accuracy)
             test_loss = cost_function(y_test, y_test_pred)
             test_losses.append(np.mean(test_loss))
 
-        return epochs, history_train_losses, test_losses, test_accuracies
+        return epochs, all_train_loss, test_losses, test_accuracies,all_train_accuracies
 
     def predict(self, a):
         for w, b in zip(self.weights, self.biases):
             z = np.dot(w, a) + b
             a = activation(z)
-        # for classification we consider maximum value of array.
-        accuracy_pred = np.where(a == np.max(a), 1, 0).astype(int)
+        #[0.3,0.4,.0.8] -> [0,0,1]
+        # Değeri en yüksek nöron aktif.
+        # Diğerleri ise sıfır .
+        accuracy_pred = np.where(a == np.max(a), 1, 0)
         return a, accuracy_pred

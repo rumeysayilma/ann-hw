@@ -32,11 +32,11 @@ After creating data we will create a multilayered backpropagation, neural networ
   - [x] Backward Propagation
   - [x] Update weights
   - [x] Momentum fonksiyonlu öğrenme hızı
-  - [ ] Training Function
-    - [ ] Start with initial weights
-    - [ ] go forward -> go backward -> error -> gradients -> update ->
-    - [ ] Stop criteria
-  - [ ] Predict Fucntion
+  - [x] Training Function
+    - [x] Start with initial weights
+    - [x] go forward -> go backward -> error -> gradients -> update ->
+    - [] Stop criteria
+  - [x] Predict Fucntion
   - [ ] Visualize
   1. soru
   -accuracy ekle

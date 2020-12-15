@@ -57,18 +57,21 @@ x_test = data_vectorizer(x_test, 4)
 
 allTestLosses = []
 allTrainLosses = []
+
 allTestAccuracies = []
+allTrainAccuracies = []
 for i in range(10):
     Network = NeuralNetwork.NeuralNetwork([4, 11-i, 3])
-    epoch, loss, test_loss, test_accuracies = Network.train(x_train=x_egitim, y_train=yd_egitim, x_test=x_test,
+    epoch, loss, test_loss, test_accuracies, train_accuracies = Network.train(x_train=x_egitim, y_train=yd_egitim, x_test=x_test,
                                                             y_test=yd_test, epochs=10, learning_rate=0.7, alfa=0.6, tqdm_=True)
     allTrainLosses.append(test_loss)
     allTestLosses.append(loss)
     allTestAccuracies.append(test_accuracies)
+    allTrainAccuracies.append(train_accuracies)
 print(allTrainLosses[0])
 print(len(allTrainLosses[0]))
 
-
+#Gerekli Görsellemeler yapılarak sonuçlar yorumlanır
 for i in range(len(allTrainLosses)):
     plt.plot(allTrainLosses[i])
     plt.title(str(11-i) + ' kadar ara nöron için  Eğitim Karesel ortalama hata')
@@ -77,9 +80,9 @@ for i in range(len(allTrainLosses)):
     plt.show()
 
     plt.plot(allTestAccuracies[i])
-    plt.title(str(11-i) + ' Test Accuracy for each data')
+    plt.title(str(11-i) + ' kadar ara nöron için Test Datası Doğruluğu')
     plt.xlabel("Data ")
-    plt.ylabel("Toplam Karesel Ortalama Hata")
+    plt.ylabel("Test Datası İçin Doğruluk")
     plt.show()
 
     plt.plot(range(len(allTrainLosses[i])), allTrainLosses[i], "ro")
@@ -87,4 +90,11 @@ for i in range(len(allTrainLosses)):
     plt.xlabel("Data ")
     plt.ylabel("Toplam Karesel Ortalama Hata")
     plt.show()
-    fig.savefig('x.png')
+
+    plt.plot(range(len(allTrainAccuracies[i])), allTrainAccuracies[i], "ro")
+    plt.title(str(11-i) + ' kadar ara nöron için Eğitim Datası Doğruluğu')
+    plt.xlabel("Data ")
+    plt.ylabel("Eğitim Datası için Doğruluk")
+    plt.show()
+
+

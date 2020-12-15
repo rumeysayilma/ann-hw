@@ -8,7 +8,7 @@ Bu sayede 0.1 değerleri ağırlıklarla çarpıldığı zaman daha anlamlı son
 t = np.where(t == 0, 0.1, 0.9)
  """
 
-
+#Burada eğitim kümesi için gerekli patternler oluşturuldu.
 def pattern_designer():
     t = np.ones((5, 10))
     t[:, 5] = 0
@@ -43,7 +43,7 @@ def pattern_designer():
 
 # harfe gürültü ekleme
 
-
+#Gürültü oluşturucu fonksiyon
 def gray_noise(t, h, a, l):
     t1 = t + np.random.normal(0, .05, t.shape)
     h1 = h + np.random.normal(0, .05, h.shape)
@@ -51,9 +51,7 @@ def gray_noise(t, h, a, l):
     l1 = l + np.random.normal(0, .05, l.shape)
     return t1, h1, a1, l1
 
-# Veri kümelerini eğitime sokmaan önce vektör haline getirme
-
-
+# Veri kümelerini eğitime sokmadan önce vektör haline getirme (4,) -> (4,1)
 def data_vectorizer(data_to_vector):
     final = [a.reshape((50, 1)) for a in data_to_vector]
     return final
@@ -63,7 +61,7 @@ def data_vectorizer(data_to_vector):
 t, h, a, l, t_degisik, h_degisik, a_degisik, l_degisik = pattern_designer()
 t_noisy, h_noisy, a_noisy, l_noisy = gray_noise(t, h, a, l)
 
-# her bir patter birbirine dik ve eşit uzaklıkta vektörler belirlendi
+# her bir pattern birbirine dik ve eşit uzaklıkta vektörler belirlendi
 e1 = [1, 0, 0, 0]
 e2 = [0, 1, 0, 0]
 e3 = [0, 0, 1, 0]
@@ -71,9 +69,11 @@ e4 = [0, 0, 0, 1]
 
 x_input = [t, h, a, l, t_degisik, h_degisik, a_degisik,
            l_degisik, t_noisy, h_noisy, a_noisy, l_noisy]
-""" for i in x_input:
+
+#eğitim kümesinin görsellenmesi
+for i in x_input:
     plt.imshow(i, cmap='gray')
-    plt.show() """
+    plt.show()
 
 # eğitim kümesindeki veriler sınıflandırıldı ve vektörleştirildi
 y_desired = [e1, e2, e3, e4, e1, e2, e3, e4, e1, e2, e3, e4]
@@ -92,9 +92,4 @@ np.save("yd_egitim", y_desired)
 np.save("x_test", x_test)
 np.save("yd_test", y_desired_test)
 
-print(x_input)
-for i in len(x_input):
-    print(x_input[i])
-    print('----------------------')
-    print(y_desired[i])
 
