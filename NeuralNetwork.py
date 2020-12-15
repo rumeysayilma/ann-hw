@@ -74,7 +74,6 @@ class NeuralNetwork(object):
         gradients = [0] * (len(self.size)-1)
         gradients[-1] = e * activation(v_values[-1].T, derivative=True).T
 
-
         # gizli katmanı gradyanları bulundu ve gradyan kümesi tamamlandı
         for l in range(len(gradients) - 2, -1, -1):
             delta = np.dot(self.weights[l + 1].transpose(), gradients[l + 1]
@@ -108,20 +107,17 @@ class NeuralNetwork(object):
 
         history_train_losses = []
         history_train_accuracies = []
-        
+
         history_test_accuracies = []
-        
+
         if tqdm_:
             epoch_iterator = tqdm(range(epochs))
         else:
             epoch_iterator = range(epochs)
 
         for e in epoch_iterator:
-
             train_losses = []
             train_accuracies = []
-            
-            test_accuracies = []
 
             for i, (a, y_d) in enumerate(zip(x_train, y_train)):
 
@@ -134,10 +130,9 @@ class NeuralNetwork(object):
                 y_train_pred = y_output_values
 
                 train_loss = cost_function(y_d, y_train_pred)
-                train_losses.append(train_loss) 
+                train_losses.append(train_loss)
                 """
-                test_accuracy = accuracy_score(y_test.T, y_test_pred.T)
-                test_accuracies.append(test_accuracy) """
+                """
 
                 # weight update
                 for i, (dw_each, db_each) in enumerate(zip(dW, db)):
@@ -152,23 +147,27 @@ class NeuralNetwork(object):
                     self.biases[i] = self.biases[i] - learning_rate * db_each
 
             history_train_losses.append(np.mean(train_losses))
-                # history_train_accuracies.append(np.mean(train_accuracies))
-            
-        
-        
-                 #history_test_accuracies.append(np.mean(test_accuracies))
-        test_losses = []
-        for i, (x_test, y_test) in enumerate(zip(x_test, y_test)):
-            y_test_pred = self.predict(x_test)
-            test_loss = cost_function(y_test, y_test_pred)
-            test_losses.append(np.mean(test_loss))  
+            # history_train_accuracies.append(np.mean(train_accuracies))
 
-            
-        return epochs,history_train_losses,test_losses
+            # history_test_accuracies.append(np.mean(test_accuracies))
+        test_losses = []
+        test_accuracies = []
+        for i, (x_test, y_test) in enumerate(zip(x_test, y_test)):
+            y_test_pred, accuracy_pred = self.predict(x_test)
+
+            accuracy = (np.sum(np.equal((y_test.T - accuracy_pred.T),
+                                        np.zeros((1, y_test.T.shape[1])))))*100 / y_test.T.shape[1]
+            print('ITS TRUE')
+            test_accuracies.append(accuracy)
+            test_loss = cost_function(y_test, y_test_pred)
+            test_losses.append(np.mean(test_loss))
+
+        return epochs, history_train_losses, test_losses, test_accuracies
 
     def predict(self, a):
         for w, b in zip(self.weights, self.biases):
             z = np.dot(w, a) + b
             a = activation(z)
-        predictions = (a > 0.5).astype(int)
-        return a
+        # for classification we consider maximum value of array.
+        accuracy_pred = np.where(a == np.max(a), 1, 0).astype(int)
+        return a, accuracy_pred
