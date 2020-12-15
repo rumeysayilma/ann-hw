@@ -24,7 +24,7 @@ def cost_function(y_true, y_pred):
     cost = (1./(2*n)) * np.sum((y_true - y_pred) ** 2)
     return cost
 
-#size boyutunda ağırlık kümesi oluşturulur. 
+#size boyutunda ağırlık kümesi oluşturulur.
 #Bu küme her bir verinin eğitimi sonrasında güncellenerek yeni veri eğitime girer
 weights = []
 for i in range(1, len(size)):
@@ -36,12 +36,12 @@ for b in size[1:]:
 
 a = X_train
 for i, (a, y_d) in enumerate(zip(a, y_desired)):
-    #forward 
+    #forward
     y_values = []
     v_values = []
     y_output_values = []
     y_values.append(a)
-    #print(y_values)  
+    #print(y_values)
     for z,(w,b) in enumerate(zip(weights, biases)):
         v = np.dot(w,y_values[z]) +b
         y = activation(v)
@@ -72,7 +72,7 @@ for i, (a, y_d) in enumerate(zip(a, y_desired)):
     """ gradients[-1] = np.reshape(gradients[-1], (4,4)) """
     #gizli katmanı gradyanları bulundu ve gradyan kümesi tamamlandı
     for l in range(len(gradients) - 2, -1, -1):
-          
+
         delta = np.dot(weights[l + 1].transpose(), gradients[l + 1]) * activation(v_values[l], derivative=True)
         gradients[l] = delta
     #print(gradients)
@@ -82,8 +82,8 @@ for i, (a, y_d) in enumerate(zip(a, y_desired)):
     dW = []
     #biaste oluşacak değişikliklerin tutulduğu küme
     db = []
-    gradients = [0] + gradients   
-    """ print(gradients) """ 
+    gradients = [0] + gradients
+    """ print(gradients) """
     for l in range(1, len(size)):
         print('****  '+str(l))
         print('y_values[l-1]')
@@ -103,11 +103,11 @@ for i, (a, y_d) in enumerate(zip(a, y_desired)):
         db.append(np.expand_dims(db_l.mean(axis=1), 1))
         print(l)
 
-        """     
+        """
         for i in range(len(dW)):
         print(dW[i].shape)
         print('----------------------------------------------------------------')
-        print(db[i].shape)   
+        print(db[i].shape)
         """
     learning_rate=0.3
     alfa=0.4
@@ -116,29 +116,29 @@ for i, (a, y_d) in enumerate(zip(a, y_desired)):
         if i > 1:
             weights[i] = weights[i] - learning_rate * dw_each + alfa*(weights[i] - weights[i-1])
         else:
-            weights[i] = weights[i] - learning_rate * dw_each 
+            weights[i] = weights[i] - learning_rate * dw_each
 
         biases[i] = biases[i] - learning_rate * db_each
     for i in range(len(weights)):
         print(' Weights ')
         print(weights[i])
-        print('||||||||||||||||||||||||||||||||||||||||||||||||||||')       
-        print(weights[i].shape) 
+        print('||||||||||||||||||||||||||||||||||||||||||||||||||||')
+        print(weights[i].shape)
 
     for w, b in zip(weights, biases):
         z = np.dot(w, a) + b
         a = activation(z)
     predictions = (a > 0.5).astype(int)
-    
+
     batch_y_train_pred = (predictions)
     train_losses = []
     train_loss = cost_function(y_d, batch_y_train_pred)
     train_losses.append(train_loss)
     print('train_losses')
     print(train_losses)
-    """ 
+    """
     train_accuracies = []
     train_accuracy = accuracy_score(y_d.T, batch_y_train_pred.T)
-    train_accuracies.append(train_accuracy)  """  
-    
+    train_accuracies.append(train_accuracy)  """
+
 

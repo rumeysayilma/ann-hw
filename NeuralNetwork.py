@@ -1,7 +1,20 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from sklearn.metrics import accuracy_score
+# from sklearn.metrics import accuracy_score
 from tqdm import tqdm
+
+
+def activation(z, derivative=False):
+    if derivative:
+        return activation(z) * (1 - activation(z))
+    else:
+        return 1 / (1 + np.exp(-z))
+
+
+def cost_function(y_true, y_pred):
+    n = y_pred.shape[1]
+    cost = (1./(2*n)) * np.sum((y_true - y_pred.T) ** 2)
+    return cost
 
 
 class NeuralNetwork(object):
@@ -16,18 +29,16 @@ class NeuralNetwork(object):
 
         self.size = size
         ''' Inıtializing our all weights  '''
-        self.weights = []
-        for i in range(1, len(self.size)):
-            self.weights.append(np.random.rand(self.size[i], self.size[i-1]))
-        self.biases = []
-        ''' All Bias values  are initilazing as vectors  '''
-        for b in self.size[1:]:
-            self.biases.append(np.random.rand(b, 1))
-        
+        self.weights = [np.random.randn(self.size[i], self.size[i-1]) * np.sqrt(
+            1 / self.size[i-1]) for i in range(1, len(self.size))]
+        self.biases = [np.random.rand(n, 1) for n in self.size[1:]]
+
     def __str__(self):
         return (str(self.weights[0]))
+
     def __repr__(self):
         return "<Test a:%s b:%s>" % (self.a, self.b)
+
     def forward(self, input):
         '''
          Bütün inputları bütün w'lar ile çarparak
@@ -36,61 +47,86 @@ class NeuralNetwork(object):
         '''
         a = input
         v_values = []
-        y_values=[]
-        y_output_values =[]
+        y_values = []
         y_values.append(a)
-    #print(y_values)  
-        for z,(w,b) in enumerate(zip(self.weights, self.biases)):
-            v = np.dot(w,y_values[z]) +b
-            y = activation(v)
+    # print(y_values)
+        for z, (w, b) in enumerate(zip(self.weights, self.biases)):
+            v = np.dot(w, y_values[z]) + b
+            a = activation(v)
             v_values.append(v)
-            #eğer son ağlıktaysak onu ayrı bir listede tutuyoruz.
+            # eğer son ağlıktaysak onu ayrı bir listede tutuyoruz.
+            y_values.append(a)
+            '''
             if z == (len(self.weights)-1):
                 y_output_values.append(y)
-                #y_values.append(y)
+                # y_values.append(y)
             else:
-                y_values.append(y)
-        return (y_output_values, v_values, y_values) 
+                y_values.append(y) '''
+        return (a, v_values, y_values)
 
     # Gradyenler bulunmaya başlandı
     def compute_gradients(self, v_values, y_d, y_output_values):
+        print('____yd___ ')
+        print(y_d)
+        print(y_d.shape)
+        print(np.reshape(y_d, (self.size[-1], 1)))
+        print(y_d.shape)
+        print('_______ ')
+        print(y_output_values[0])
+        print(y_output_values)
+        print(y_output_values.shape)
 
-        #önce hata bulundu
-        e = (np.reshape(y_d,(4,1)) - y_output_values[0])
+        # önce hata bulundu
+        e = (np.reshape(y_d, (self.size[-1], 1)) - y_output_values[0].T)
 
-        #çıkış gradyanı bulundu ve tüm gradyanları içerecek kümeye eklendi
+        # çıkış gradyanı bulundu ve tüm gradyanları içerecek kümeye eklendi
         gradients = [0] * (len(self.size)-1)
-        gradients[-1] =  e * activation(v_values[-1].T, derivative=True).T  
+        print('E is*****')
+        print(e)
+        print(e.shape)
+        print('v values')
+        print(v_values[-1].T)
+        print(v_values[-1].T.shape)
 
-        #gizli katmanı gradyanları bulundu ve gradyan kümesi tamamlandı
-        for l in range(len(gradients) - 2, -1, -1):          
-            delta = np.dot(self.weights[l + 1].transpose(), gradients[l + 1]) * activation(v_values[l], derivative=True)
-            gradients[l] = delta   
+        gradients[-1] = e * activation(v_values[-1].T, derivative=True).T
+        print('_______ gradients_output')
+        print(gradients[-1])
 
-        """gradients bütün datalar için bütün gradientleri içerecek.yani her veri için giriş çıkış dahil 
+        # gizli katmanı gradyanları bulundu ve gradyan kümesi tamamlandı
+        for l in range(len(gradients) - 2, -1, -1):
+            delta = np.dot(self.weights[l + 1].transpose(), gradients[l + 1]
+                           ) * activation(v_values[l], derivative=True)
+            gradients[l] = delta
+
+        """
+        gradients bütün datalar için bütün gradientleri içerecek.yani her veri için giriş çıkış dahil
         toplam katman sayısının 1 eksiği kadar gradyan burada tutulur.
-        Bizim verimiz için 3 katman-1 --> 2 gradyan her veri için burada tutuluyor  """
+        Bizim verimiz için 3 katman-1 --> 2 gradyan her veri için burada tutuluyor
+        """
         return(gradients)
 
     def backpropagate(self, gradients, v_values, y_values):
 
         dW = []
         db = []
-        gradients = [0] + gradients  
-        #Bias ve ağırlıkta oluşacak değişimler bulunur
+        gradients = [0] + gradients
+        # Bias ve ağırlıkta oluşacak değişimler bulunur
         for l in range(1, len(self.size)):
+            # print(gradients[l])
+            # print(l)
+            # print(y_values[l-1])
             dW_l = np.dot(gradients[l], y_values[l-1].transpose())
             db_l = gradients[l]
             dW.append(dW_l)
             db.append(np.expand_dims(db_l.mean(axis=1), 1))
-        return dW, db   
+        return dW, db
 
     def train(self, x_train, y_train, x_test, y_test, epochs, learning_rate, alfa, tqdm_=True):
-        
+
         history_train_losses = []
         history_train_accuracies = []
         history_test_losses = []
-        history_test_accuracies = []  
+        history_test_accuracies = []
 
         if tqdm_:
             epoch_iterator = tqdm(range(epochs))
@@ -104,78 +140,74 @@ class NeuralNetwork(object):
             test_losses = []
             test_accuracies = []
 
-            for i, (a, y_d) in enumerate(zip(x_train, y_train)): 
+            for i, (a, y_d) in enumerate(zip(x_train, y_train)):
 
                 y_output_values, v_values, y_values = self.forward(a)
-                gradients = self.compute_gradients(v_values, y_d, y_output_values)
+                gradients = self.compute_gradients(
+                    v_values, y_d, y_output_values)
+                print('****************************')
+                print(gradients)
+                print('____________________________')
+                print(v_values)
+                print('____________________________')
+                print(y_values)
                 dW, db = self.backpropagate(gradients, v_values, y_values)
 
                 y_train_pred = y_output_values
+
+                print('y_train_pred is ????')
+                print(y_train_pred)
                 """ self.predict(a) """
-
+                print('********** y_d ***********')
+                print(y_d)
+                print(y_d.shape)
+                print('********** y_train_pred **')
+                print(y_train_pred[0])
+                print(y_train_pred[0].shape)
+                print('****** difference is *****')
+                print(y_d - y_train_pred[0].T)
                 train_loss = cost_function(y_d, y_train_pred)
+                # print('****** loss is ********')
+                # print(train_loss)
                 train_losses.append(train_loss)
-                #train_accuracy = accuracy_score(y_d.T, y_train_pred.T)
-                #train_accuracies.append(train_accuracy)
+                # train_accuracy = accuracy_score(y_d.T, y_train_pred.T)
+                # train_accuracies.append(train_accuracy)
 
-                """                
+                """
                 y_test_pred = self.predict(x_test)
 
                 test_loss = cost_function(y_test, y_test_pred)
-                test_losses.append(test_loss) 
+                test_losses.append(test_loss)
                 """
-                """                 
+                """
                 test_accuracy = accuracy_score(y_test.T, y_test_pred.T)
                 test_accuracies.append(test_accuracy) """
 
                 # weight update
                 for i, (dw_each, db_each) in enumerate(zip(dW, db)):
                     if i > 1:
-                        self.weights[i] = self.weights[i] - learning_rate * dw_each + alfa*(self.weights[i] - self.weights[i-1])
+                        self.weights[i] = self.weights[i] + learning_rate * \
+                            dw_each - alfa * \
+                            (self.weights[i] - self.weights[i-1])
                     else:
-                        self.weights[i] = self.weights[i] - learning_rate * dw_each 
+                        self.weights[i] = self.weights[i] + \
+                            learning_rate * dw_each
 
                     self.biases[i] = self.biases[i] - learning_rate * db_each
 
                 history_train_losses.append(np.mean(train_losses))
-                #history_train_accuracies.append(np.mean(train_accuracies))           
-                #history_test_losses.append(np.mean(test_losses))
+                # history_train_accuracies.append(np.mean(train_accuracies))
+                # history_test_losses.append(np.mean(test_losses))
                 """ history_test_accuracies.append(np.mean(test_accuracies)) """
 
         history = {'epochs': epochs,
-                   'train_loss': history_train_losses, 
+                   'train_loss': history_train_losses,
                    }
         return history
+
     def predict(self, a):
         for w, b in zip(self.weights, self.biases):
             z = np.dot(w, a) + b
             a = activation(z)
         predictions = (a > 0.5).astype(int)
         return predictions
-
-
-def activation(z, derivative=False):
-    if derivative:
-        return activation(z) * (1 - activation(z))
-    else:
-        return 1 / (1 + np.exp(-z))
-
-def cost_function(y_true, y_pred):
-    n = y_pred.shape[1]
-    cost = (1./(2*n)) * np.sum((y_true - y_pred) ** 2)
-    return cost
-
-def cost_function_prime(y_true, y_pred):
-    """
-    Computes the derivative of the loss function w.r.t the activation of the output layer
-    Parameters:
-    ---
-    y_true: ground-truth vector
-    y_pred: prediction vector
-    Returns:
-    ---
-    cost_prime: derivative of the loss w.r.t. the activation of the output
-    shape: (n[L], batch_size)    
-    """
-    cost_prime = y_pred - y_true
-    return cost_prime    
