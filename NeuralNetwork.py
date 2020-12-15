@@ -105,7 +105,7 @@ class NeuralNetwork(object):
                 # forward -> gradients -> backward -> test -> update weight,biases
                 y_train_pred, v_values, y_values = self.forward(a)
                 gradients = self.compute_gradients(
-                    v_values, y_d, y_output_values)
+                    v_values, y_d, y_train_pred)
                 dW, db = self.backpropagate(gradients, v_values, y_values)
                 
                 #loss ve accuracy hesaplanıyor.
@@ -119,8 +119,8 @@ class NeuralNetwork(object):
                 for i, (dw_each, db_each) in enumerate(zip(dW, db)):
                     if i > 1:
                         self.weights[i] = self.weights[i] + learning_rate * \
-                            dw_each - alfa * \
-                            (self.weights[i] - self.weights[i-1])
+                            dw_each 
+                            #- alfa * (self.weights[i] - self.weights[i-1])
                     else:
                         self.weights[i] = self.weights[i] + \
                             learning_rate * dw_each
