@@ -18,7 +18,6 @@ for i in range(2, 100):
     a = np.array(a)
     x.append(a)
     y_dvalue = []
-    # y_dvalue.append()
     y_d.append((a[0] + a[1]+a[2] + random.random()))
 
 
@@ -67,27 +66,23 @@ print(len(allTrainLosses[0]))
 
 # Gerekli Görsellemeler yapılarak sonuçlar yorumlanır
 for i in range(len(allTrainLosses)):
-    plt.plot(allTrainLosses[i])
-    plt.title(str(11-i) + ' kadar ara nöron için  Eğitim Karesel ortalama hata')
-    plt.xlabel("Epoch sayısı")
-    plt.ylabel("Toplam Karesel Ortalama Hata")
-    plt.show()
 
     plt.plot(allTestAccuracies[i])
-    plt.title(str(11-i) + ' kadar ara nöron için Test Datası Doğruluğu, ortalama = %' +
+    plt.title('Test Datası Doğruluğu, ortalama = %' +
               str(np.mean(allTestAccuracies[i])))
     plt.xlabel("Data ")
     plt.ylabel("Test Datası İçin Doğruluk")
     plt.show()
 
     plt.plot(range(len(allTrainLosses[i])), allTrainLosses[i], "ro")
-    plt.title(str(11-i) + ' kadar ara nöron için Test Karesel ortalama hata')
+    plt.title('Test Karesel ortalama hata')
     plt.xlabel("Data ")
     plt.ylabel("Toplam Karesel Ortalama Hata")
     plt.show()
 
     plt.plot(range(len(allTrainAccuracies[i])), allTrainAccuracies[i], "ro")
-    plt.title(str(11-i) + ' kadar ara nöron için Eğitim Datası Doğruluğu')
+    plt.title( ' Eğitim Datası Doğruluğu , ortalama= %' +
+              str(np.mean(allTrainAccuracies[i])))
     plt.xlabel("Data ")
     plt.ylabel("Eğitim Datası için Doğruluk")
     plt.show()
