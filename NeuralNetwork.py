@@ -3,14 +3,18 @@ from matplotlib import pyplot as plt
 # from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
-#sigmoid aktivasyon fonksiyonu.
+# sigmoid aktivasyon fonksiyonu.
+
+
 def activation(z, derivative=False):
     if derivative:
         return activation(z) * (1 - activation(z))
     else:
         return 1 / (1 + np.exp(-z))
 
-#Karesel Hata Hesaplayıcı
+# Karesel Hata Hesaplayıcı
+
+
 def cost_function(y_true, y_pred):
     n = y_pred.shape[1]
     cost = (1./(2*n)) * np.sum((y_true - y_pred.T) ** 2)
@@ -24,21 +28,22 @@ class NeuralNetwork(object):
     3 nöron gizli katman
     2 nöron çıkış
     '''
+
     def __init__(self, size):
 
         self.size = size
-        ''' 
+        '''
         Belirtilen size'a uygun olarak
         ilk ağırlıklar ve biase'ler rastgele
-        elemanlardan oluşturuluyor.  
+        elemanlardan oluşturuluyor.
         '''
-        self.weights = [np.random.randn(self.size[i], self.size[i-1]) * np.sqrt(
-            1 / self.size[i-1]) for i in range(1, len(self.size))]
+        self.weights = [np.random.randn(
+            self.size[i], self.size[i-1]) for i in range(1, len(self.size))]
         self.biases = [np.random.rand(n, 1) for n in self.size[1:]]
 
     def forward(self, input):
         '''
-        Bütün inputlar, bütün w'lar ile sırayla 
+        Bütün inputlar, bütün w'lar ile sırayla
         çarpılarak ilerleniyor.
         y değerleri ve v değerleri
         gradyen hesabı için kaydediliyor
@@ -47,7 +52,7 @@ class NeuralNetwork(object):
         v_values = []
         y_values = []
         y_values.append(a)
-        #Burada w,b o katmana ait w,b'yi temsil ediyor
+        # Burada w,b o katmana ait w,b'yi temsil ediyor
         for z, (w, b) in enumerate(zip(self.weights, self.biases)):
             v = np.dot(w, y_values[z]) + b
             a = activation(v)
@@ -86,12 +91,13 @@ class NeuralNetwork(object):
             db.append(np.expand_dims(db_l.mean(axis=1), 1))
         return dW, db
 
-    def train(self, x_train, y_train, x_test, y_test, epochs, learning_rate, alfa, tqdm_=True):
-
-        #boş hata ve accuracy listeleri
+    def train(self, x_train, y_train, x_test, y_test, epochs, learning_rate, alfa, tqdm_=True, stop_error=0.01):
+        # momentum terimi için ağırlıklar tutuluyor.
+        allWeights = []
+        # boş hata ve accuracy listeleri
         all_train_loss = []
         all_train_accuracies = []
-        #tqdm isteğe bağlı..
+        # tqdm isteğe bağlı..
         if tqdm_:
             epoch_iterator = tqdm(range(epochs))
         else:
@@ -107,26 +113,37 @@ class NeuralNetwork(object):
                 gradients = self.compute_gradients(
                     v_values, y_d, y_train_pred)
                 dW, db = self.backpropagate(gradients, v_values, y_values)
-                
-                #loss ve accuracy hesaplanıyor.
+
+                # loss ve accuracy hesaplanıyor.
                 train_loss = cost_function(y_d, y_train_pred)
                 train_losses.append(train_loss)
-                train_accuracy = (np.sum(np.equal((y_d.T - y_train_pred.T),
-                                        np.zeros((1, y_d.shape[0])))))*100 / y_d.shape[0]
+                if self.size[-1] == 1:
+                    train_accuracy = (np.sum(np.equal((y_d - y_train_pred),
+                                                      np.zeros((1, self.size[-1])))))*100 / (self.size[-1])
+                else:
+                    train_accuracy = (np.sum(np.equal((y_d.T - y_train_pred.T),
+                                                      np.zeros((1, self.size[-1])))))*100 / (self.size[-1])
                 train_accuracies.append(train_accuracy)
 
+                allWeights.append([])
                 # weight update
-                for i, (dw_each, db_each) in enumerate(zip(dW, db)):
+                for k, (dw_each, db_each) in enumerate(zip(dW, db)):
+
+                    allWeights[-1].append(dw_each)
                     if i > 1:
-                        self.weights[i] = self.weights[i] + learning_rate * \
-                            dw_each 
-                            #- alfa * (self.weights[i] - self.weights[i-1])
+                        self.weights[k] = self.weights[k] + learning_rate * \
+                            dw_each - alfa * \
+                            (allWeights[-1][k] - allWeights[-2][k])
                     else:
-                        self.weights[i] = self.weights[i] + \
+                        self.weights[k] = self.weights[k] + \
                             learning_rate * dw_each
 
-                    self.biases[i] = self.biases[i] - learning_rate * db_each
-            #her epochta loss ve accuracy ortalaması  alınıp listeye ekleniyor.
+                    self.biases[k] = self.biases[k] - learning_rate * db_each
+                # print(allWeights)
+            # her epochta loss ve accuracy ortalaması  alınıp listeye ekleniyor.
+            if(np.mean(train_losses) <= stop_error):
+                print('we dont need more education: '+str(e))
+
             all_train_loss.append(np.mean(train_losses))
             all_train_accuracies.append(np.mean(train_accuracy))
 
@@ -138,18 +155,18 @@ class NeuralNetwork(object):
             # tahmini y değerinden gerçek y değeri çıkarılıp farkları incelendi
             # sıfır olanlar için doğru tahmin ,farklı olanlar yanlıştır.
             accuracy = (np.sum(np.equal((y_test.T - accuracy_pred.T),
-                                        np.zeros((1, y_test.shape[0])))))*100 / y_test.shape[0]            
+                                        np.zeros((1, self.size[-1])))))*100 / self.size[-1]
             test_accuracies.append(accuracy)
             test_loss = cost_function(y_test, y_test_pred)
             test_losses.append(np.mean(test_loss))
 
-        return epochs, all_train_loss, test_losses, test_accuracies,all_train_accuracies
+        return epochs, all_train_loss, test_losses, test_accuracies, all_train_accuracies
 
     def predict(self, a):
         for w, b in zip(self.weights, self.biases):
             z = np.dot(w, a) + b
             a = activation(z)
-        #[0.3,0.4,.0.8] -> [0,0,1]
+        # [0.3,0.4,.0.8] -> [0,0,1]
         # Değeri en yüksek nöron aktif.
         # Diğerleri ise sıfır .
         accuracy_pred = np.where(a == np.max(a), 1, 0)

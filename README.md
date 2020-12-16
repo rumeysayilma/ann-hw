@@ -25,7 +25,8 @@ After creating data we will create a multilayered backpropagation, neural networ
 
 ## Create Neural Network Class
 
-- [/] Create a Class that handles everything in a multilayer Perceptron.
+- [x] Create a Class that handles everything in a multilayer Perceptron.
+
   - [x] initialize biases and weights
   - [x] Forward Propagation
   - [x] Gradient Calculate
@@ -35,17 +36,18 @@ After creating data we will create a multilayered backpropagation, neural networ
   - [x] Training Function
     - [x] Start with initial weights
     - [x] go forward -> go backward -> error -> gradients -> update ->
-    - [] Stop criteria
+    - [x] Stop criteria
   - [x] Predict Fucntion
-  - [ ] Visualize
+  - [x] Visualize
+
   1. soru
-  -accuracy ekle
-  -hem test hem eğitimin olduğ grafikleri kaydet
+     -accuracy ekle
+     -hem test hem eğitimin olduğ grafikleri kaydet
 
   2. soru
-  -sorun çöz
-  -accuracy ekle
-  -hem test hem eğitimin olduğ grafikleri kaydet
+     -sorun çöz
+     -accuracy ekle
+     -hem test hem eğitimin olduğ grafikleri kaydet
 
   Son
   döküman
